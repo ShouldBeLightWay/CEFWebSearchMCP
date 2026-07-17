@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.24)
 project(CEFWebSearchMCP
     VERSION 0.1.0
     DESCRIPTION "Reliable localhost Web Search MCP server based on CEF"
-    LANGUAGES CXX)
+  LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(CEFWSMCP_BUILD_TESTS "Build tests" ON)
 option(CEFWSMCP_ENABLE_WARNINGS "Enable strict warnings" ON)
+option(CEFWSMCP_ENABLE_CEF "Enable libcef integration" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -27,9 +28,9 @@ if(CEFWSMCP_ENABLE_WARNINGS)
   )
 endif()
 
-# NOTE: CEF integration is intentionally abstracted for initial scaffold.
-# Add your local/libcef setup in cmake/CEFConfig.cmake and include it here.
-# include(CEFConfig)
+if(CEFWSMCP_ENABLE_CEF)
+  include(CEFConfig)
+endif()
 
 add_subdirectory(src)
 
