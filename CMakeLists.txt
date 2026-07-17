@@ -19,12 +19,13 @@ include(CTest)
 
 if(CEFWSMCP_ENABLE_WARNINGS)
   add_compile_options(
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 /permissive->
-    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4>
+    $<$<CXX_COMPILER_ID:MSVC>:/permissive->
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wpedantic>
   )
 endif()
-
-find_package(Boost 1.83 REQUIRED COMPONENTS system filesystem program_options)
 
 # NOTE: CEF integration is intentionally abstracted for initial scaffold.
 # Add your local/libcef setup in cmake/CEFConfig.cmake and include it here.
