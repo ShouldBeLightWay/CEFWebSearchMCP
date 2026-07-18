@@ -9,6 +9,13 @@ target_include_directories(cefwebsearchmcp_core
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
 )
 
+if(CEFWSMCP_ENABLE_CEF)
+  target_include_directories(cefwebsearchmcp_core
+    PRIVATE
+      ${CEFWSMCP_CEF_ROOT}
+  )
+endif()
+
 target_compile_features(cefwebsearchmcp_core PUBLIC cxx_std_20)
 
 add_executable(cefwebsearchmcp_server
@@ -19,12 +26,12 @@ if(CEFWSMCP_ENABLE_CEF)
   SET_EXECUTABLE_TARGET_PROPERTIES(cefwebsearchmcp_server)
   add_dependencies(cefwebsearchmcp_server libcef_dll_wrapper)
 
-  target_link_libraries(cefwebsearchmcp_server
-    PRIVATE
-      libcef_lib
-      libcef_dll_wrapper
-      ${CEF_STANDARD_LIBS}
-  )
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(cefwebsearchmcp_server PRIVATE
+      -Wno-gcc-install-dir-libstdcxx
+      -Wno-error=gcc-install-dir-libstdcxx
+    )
+  endif()
 
   if(OS_LINUX)
     set_target_properties(cefwebsearchmcp_server PROPERTIES
@@ -49,7 +56,17 @@ endif()
 target_link_libraries(cefwebsearchmcp_server
   PRIVATE
     cefwebsearchmcp_core
+    Boost::program_options
 )
+
+if(CEFWSMCP_ENABLE_CEF)
+  target_link_libraries(cefwebsearchmcp_server
+    PRIVATE
+      libcef_lib
+      libcef_dll_wrapper
+      ${CEF_STANDARD_LIBS}
+  )
+endif()
 
 install(TARGETS cefwebsearchmcp_server
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

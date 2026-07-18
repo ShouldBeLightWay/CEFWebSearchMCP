@@ -2,6 +2,8 @@ set(CEF_USE_SANDBOX OFF CACHE BOOL "Disable CEF sandbox for initial Linux integr
 
 find_package(CEF REQUIRED)
 
+set(CEFWSMCP_CEF_ROOT "${_CEF_ROOT}" CACHE INTERNAL "Resolved CEF root path")
+
 if(OS_MAC)
 	message(FATAL_ERROR "CEFWebSearchMCP CEFConfig currently supports Linux/Windows style libcef linking only.")
 endif()
@@ -18,9 +20,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(libcef_dll_wrapper PRIVATE
 		-Wno-gnu-zero-variadic-macro-arguments
 		-Wno-error=gnu-zero-variadic-macro-arguments
+		-Wno-gcc-install-dir-libstdcxx
+		-Wno-error=gcc-install-dir-libstdcxx
 	)
 endif()
 
-message(STATUS "CEF root: ${CEF_ROOT}")
+message(STATUS "CEF root: ${CEFWSMCP_CEF_ROOT}")
 message(STATUS "CEF binary dir: ${CEF_BINARY_DIR}")
 message(STATUS "CEF resource dir: ${CEF_RESOURCE_DIR}")
