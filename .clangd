@@ -1,0 +1,7 @@
+CompileFlags:
+  # Use a local wrapper that auto-detects a valid GCC install dir with libstdc++ headers.
+  Compiler: ../scripts/clangd-cxx-driver.sh
+
+  # Keep C++ driver behavior consistent with compile_commands entries.
+  Add:
+    - --driver-mode=g++

@@ -1,0 +1,6 @@
+{
+  "clangd.arguments": [
+    "--enable-config",
+    "--query-driver=/home/natsuki/work/CEFWebSearchMCP/scripts/clangd-cxx-driver.sh,/usr/bin/clang++-*,/usr/bin/g++-*"
+  ]
+}
