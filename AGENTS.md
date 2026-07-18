@@ -59,6 +59,7 @@ Reason:
 ## Runtime Notes
 
 - CEF may warn if cache path is not absolute.
+- Expected `--smoke-run` / Ozone quirks: see `doc/cef-runtime-notes.md`.
 - `chrome-sandbox` SUID permissions may be required for full Linux runtime behavior:
 
 ```bash
@@ -87,6 +88,7 @@ Use these docs as source of truth for architecture and planning:
 - `doc/risk-register.md`
 - `doc/crawler-server-gap-analysis.md`
 - `doc/clangd-setup.md`
+- `doc/cef-runtime-notes.md`
 
 ## Suggested Agent Behavior in New Chats
 
