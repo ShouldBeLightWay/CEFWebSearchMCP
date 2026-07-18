@@ -9,6 +9,8 @@
 #define CXXOPTS_NO_RTTI
 #include "cefwebsearchmcp/core/cxxopts.hpp"
 
+#include "include/cef_app.h"
+
 #include "cefwebsearchmcp/config/runtime_config.hpp"
 #include "cefwebsearchmcp/core/application.hpp"
 
@@ -23,10 +25,8 @@ bool is_cef_subprocess_arg(const char* arg) {
 int main(int argc, char** argv) {
   for (int i = 1; i < argc; ++i) {
     if (is_cef_subprocess_arg(argv[i])) {
-      cefwebsearchmcp::config::RuntimeConfig child_config;
-      child_config.enable_cef_profiles = true;
-      cefwebsearchmcp::core::Application child_app(std::move(child_config));
-      return child_app.run(argc, argv);
+      CefMainArgs main_args(argc, argv);
+      return CefExecuteProcess(main_args, nullptr, nullptr);
     }
   }
 
