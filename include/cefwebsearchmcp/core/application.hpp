@@ -10,7 +10,7 @@ class Application {
  public:
   explicit Application(config::RuntimeConfig config);
 
-  int run();
+  int run(int argc, char** argv);
   const config::RuntimeConfig& config() const noexcept;
 
  private:
