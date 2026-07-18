@@ -22,6 +22,10 @@ Scaffold phase is complete:
 
 ## Build
 
+Current recommendation on Linux (Ubuntu): use GCC via presets.
+
+`clang++` builds are currently unstable in this project+environment combination due to toolchain/stdlib resolution issues and occasional runtime crashes during CEF bootstrap.
+
 Prerequisites:
 
 - CMake >= 3.24
@@ -35,6 +39,21 @@ cmake -S . -B build
 cmake --build build
 ```
 
+Recommended preset flow:
+
+```bash
+cmake --preset gcc-debug
+cmake --build --preset gcc-debug
+ctest --preset gcc-debug
+```
+
+Alternative (recommended on Linux when `clang++-22` has libstdc++ autodetection issues):
+
+```bash
+cmake -S . -B build-gcc -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+cmake --build build-gcc
+```
+
 Run smoke test:
 
 ```bash
@@ -45,6 +64,12 @@ Run server scaffold:
 
 ```bash
 ./build/src/cefwebsearchmcp_server --help
+```
+
+Run CEF bootstrap smoke test:
+
+```bash
+./build-gcc/src/cefwebsearchmcp_server --smoke-run
 ```
 
 ## Repository layout
