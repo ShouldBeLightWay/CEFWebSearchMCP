@@ -8,6 +8,9 @@ struct SessionOptions {
   bool use_sandbox{false};
   std::string cache_path;
   std::string log_file;
+  // Chromium Ozone platform. Empty keeps CEF/Chromium default.
+  // "x11" avoids noisy Wayland NOTIMPLEMENTED stubs on Linux desktop sessions.
+  std::string ozone_platform{"x11"};
 };
 
 class SessionManager {

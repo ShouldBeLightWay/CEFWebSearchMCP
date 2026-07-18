@@ -1,10 +1,10 @@
 #include "cefwebsearchmcp/cef/session_manager.hpp"
 
-#include <cerrno>
 #include <filesystem>
 #include <system_error>
 
 #include "include/cef_app.h"
+#include "include/cef_command_line.h"
 
 namespace cefwebsearchmcp::cef {
 
@@ -36,6 +36,32 @@ void ensure_directory_exists(const std::filesystem::path& path) {
   std::filesystem::create_directories(path, ec);
 }
 
+// Browser-process CefApp used to inject Chromium switches before CEF starts.
+// On Linux Wayland sessions CEF defaults to ozone/wayland, which currently logs
+// many NOTIMPLEMENTED stubs. Prefer X11 (XWayland) for windowless bootstrap.
+class BrowserApp : public CefApp {
+ public:
+  explicit BrowserApp(std::string ozone_platform)
+      : ozone_platform_(std::move(ozone_platform)) {}
+
+  void OnBeforeCommandLineProcessing(
+      const CefString& process_type,
+      CefRefPtr<CefCommandLine> command_line) override {
+    if (!process_type.empty() || ozone_platform_.empty()) {
+      return;
+    }
+
+    if (!command_line->HasSwitch("ozone-platform")) {
+      command_line->AppendSwitchWithValue("ozone-platform", ozone_platform_);
+    }
+  }
+
+ private:
+  std::string ozone_platform_;
+
+  IMPLEMENT_REFCOUNTING(BrowserApp);
+};
+
 }  // namespace
 
 bool SessionManager::initialize(const SessionOptions& options, int argc, char** argv) {
@@ -50,8 +76,9 @@ bool SessionManager::initialize(const SessionOptions& options, int argc, char** 
   ensure_directory_exists(log_file.parent_path());
 
   CefMainArgs main_args(argc, argv);
+  CefRefPtr<BrowserApp> app(new BrowserApp(options.ozone_platform));
 
-  const int subprocess_code = CefExecuteProcess(main_args, nullptr, nullptr);
+  const int subprocess_code = CefExecuteProcess(main_args, app, nullptr);
   if (subprocess_code >= 0) {
     return false;
   }
@@ -70,7 +97,7 @@ bool SessionManager::initialize(const SessionOptions& options, int argc, char** 
     CefString(&settings.log_file) = log_file.string();
   }
 
-  initialized_ = CefInitialize(main_args, settings, nullptr, nullptr);
+  initialized_ = CefInitialize(main_args, settings, app, nullptr);
   return initialized_;
 }
 
