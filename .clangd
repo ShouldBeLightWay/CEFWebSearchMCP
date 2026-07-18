@@ -5,3 +5,11 @@ CompileFlags:
   # Keep C++ driver behavior consistent with compile_commands entries.
   Add:
     - --driver-mode=g++
+    # CEF headers use GNU zero-variadic macros; under Clang+Werror this aborts
+    # parsing with fatal_too_many_errors and cascades into fake include failures.
+    - -Wno-gnu-zero-variadic-macro-arguments
+
+  # -Werror is for the real g++ build; clangd should not treat CEF pedantic
+  # warnings as fatal parse errors.
+  Remove:
+    - -Werror
