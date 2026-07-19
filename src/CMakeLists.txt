@@ -56,7 +56,6 @@ endif()
 target_link_libraries(cefwebsearchmcp_server
   PRIVATE
     cefwebsearchmcp_core
-    Boost::program_options
 )
 
 if(CEFWSMCP_ENABLE_CEF)

@@ -48,8 +48,6 @@ if(POLICY CMP0167)
   cmake_policy(SET CMP0167 NEW)
 endif()
 
-find_package(Boost 1.83 REQUIRED COMPONENTS program_options)
-
 if(CEFWSMCP_ENABLE_CEF)
   include(CEFConfig)
 endif()
