@@ -30,7 +30,13 @@ Prerequisites:
 
 - CMake >= 3.24
 - C++20 compiler
-- Boost 1.83+ (`system`, `filesystem`, `program_options`)
+- A built CEF binary distribution with `CEF_ROOT` pointing to its root directory, either via environment variable or `-DCEF_ROOT=...`
+
+Notes:
+
+- The project does not use Boost for CLI parsing anymore.
+- `CEF_ROOT` must point at the unpacked CEF distribution root that contains its `cmake/` directory.
+- On Linux, the CEF runtime files and helper binaries are copied from that distribution during the build.
 
 Configure and build:
 
