@@ -21,7 +21,7 @@ Common log fragments from Clangd:
 Quick check command:
 
 ```bash
-/home/natsuki/.config/Code/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/22.1.6/clangd_22.1.6/bin/clangd \
+$HOME/.config/Code/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/22.1.6/clangd_22.1.6/bin/clangd \
 	--check=src/main.cpp \
 	--compile-commands-dir=build \
 	--enable-config \
