@@ -70,3 +70,6 @@ Testing/
 
 #CEF cache
 runtime/
+
+# Local / CI CEF binary distribution downloads
+third_party/cef/

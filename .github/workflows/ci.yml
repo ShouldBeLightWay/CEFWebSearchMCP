@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: GCC build / test / smoke-run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            curl \
+            ca-certificates \
+            xvfb \
+            libgtk-3-0 \
+            libnss3 \
+            libnspr4 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libxkbcommon0 \
+            libx11-xcb1 \
+            libxcb1 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxext6 \
+            libxfixes3 \
+            libxrandr2 \
+            libxrender1 \
+            libxshmfence1 \
+            libgbm1 \
+            libpango-1.0-0 \
+            libcairo2 \
+            libasound2t64
+
+      - name: Load pinned CEF version
+        id: cef
+        run: |
+          set -euo pipefail
+          # shellcheck source=ci/cef-version.env
+          source ci/cef-version.env
+          {
+            echo "version=${CEF_VERSION}"
+            echo "platform=${CEF_PLATFORM}"
+            echo "variant=${CEF_BUILD_VARIANT}"
+            echo "root=${GITHUB_WORKSPACE}/third_party/cef/cef_binary_${CEF_VERSION}_${CEF_PLATFORM}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Cache CEF binary distribution
+        uses: actions/cache@v4
+        with:
+          path: third_party/cef
+          key: cef-${{ steps.cef.outputs.version }}-${{ steps.cef.outputs.platform }}-${{ steps.cef.outputs.variant }}
+
+      - name: Fetch CEF
+        run: |
+          chmod +x scripts/fetch-cef.sh
+          scripts/fetch-cef.sh "${GITHUB_WORKSPACE}/third_party/cef"
+
+      - name: Configure (GCC Debug preset)
+        env:
+          CEF_ROOT: ${{ steps.cef.outputs.root }}
+        run: cmake --preset gcc-debug
+
+      - name: Build
+        run: cmake --build --preset gcc-debug
+
+      - name: Unit tests (ctest)
+        run: ctest --preset gcc-debug --output-on-failure
+
+      - name: Server help
+        run: ./build-gcc/src/cefwebsearchmcp_server --help
+
+      - name: CEF smoke-run (xvfb)
+        env:
+          CEF_CACHE: ${{ runner.temp }}/cef_cache
+        run: |
+          mkdir -p "${CEF_CACHE}"
+          xvfb-run -a ./build-gcc/src/cefwebsearchmcp_server \
+            --smoke-run \
+            --cef-cache-path="${CEF_CACHE}"

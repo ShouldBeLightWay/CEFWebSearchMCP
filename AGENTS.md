@@ -48,6 +48,14 @@ Run CEF bootstrap smoke path:
 ./build-gcc/src/cefwebsearchmcp_server --smoke-run
 ```
 
+## CI (GitHub-hosted)
+
+Workflow: `.github/workflows/ci.yml` (`ubuntu-24.04`, GCC preset).
+
+Pinned CEF version: `ci/cef-version.env` (fetched by `scripts/fetch-cef.sh`).
+
+After meaningful CI-related edits, prefer validating locally with the same preset flow, then push and confirm the Actions run is green.
+
 ## Toolchain Guidance
 
 Current recommendation:

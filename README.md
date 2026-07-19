@@ -78,6 +78,16 @@ Run CEF bootstrap smoke test:
 ./build-gcc/src/cefwebsearchmcp_server --smoke-run
 ```
 
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on `push` to `main`, pull requests, and manual `workflow_dispatch`:
+
+1. Download the pinned CEF **minimal** Linux binary distribution (`ci/cef-version.env` + `scripts/fetch-cef.sh`).
+2. Configure/build with the `gcc-debug` CMake preset.
+3. Run `ctest`, `--help`, and `--smoke-run` under `xvfb-run` (no desktop required).
+
+CEF downloads are cached between workflow runs. Bump the pin in `ci/cef-version.env` when upgrading CEF locally and in CI together.
+
 ## Repository layout
 
 - `include/cefwebsearchmcp/`: public headers and interfaces.
