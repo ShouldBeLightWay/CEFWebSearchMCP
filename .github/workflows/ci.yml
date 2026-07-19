@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install system packages
         run: |
@@ -65,7 +65,7 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Cache CEF binary distribution
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: third_party/cef
           key: cef-${{ steps.cef.outputs.version }}-${{ steps.cef.outputs.platform }}-${{ steps.cef.outputs.variant }}-v2
