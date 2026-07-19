@@ -7,18 +7,55 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "${ROOT_DIR}/ci/cef-version.env"
 
 DEST_ROOT="${1:-${ROOT_DIR}/third_party/cef}"
-DIR_NAME="cef_binary_${CEF_VERSION}_${CEF_PLATFORM}"
+
+# Spotify CEF archives unpack to a directory matching the archive basename
+# (including the build variant suffix, e.g. `_minimal`).
+if [[ -n "${CEF_BUILD_VARIANT}" && "${CEF_BUILD_VARIANT}" != "standard" ]]; then
+  DIR_NAME="cef_binary_${CEF_VERSION}_${CEF_PLATFORM}_${CEF_BUILD_VARIANT}"
+else
+  DIR_NAME="cef_binary_${CEF_VERSION}_${CEF_PLATFORM}"
+fi
+
 CEF_ROOT="${DEST_ROOT}/${DIR_NAME}"
-ARCHIVE_NAME="${DIR_NAME}_${CEF_BUILD_VARIANT}.tar.bz2"
+ARCHIVE_NAME="${DIR_NAME}.tar.bz2"
 ARCHIVE_PATH="${DEST_ROOT}/${ARCHIVE_NAME}"
 ENCODED_VERSION="${CEF_VERSION//+/%2B}"
-URL="https://cef-builds.spotifycdn.com/cef_binary_${ENCODED_VERSION}_${CEF_PLATFORM}_${CEF_BUILD_VARIANT}.tar.bz2"
+URL="https://cef-builds.spotifycdn.com/cef_binary_${ENCODED_VERSION}_${CEF_PLATFORM}"
+if [[ -n "${CEF_BUILD_VARIANT}" && "${CEF_BUILD_VARIANT}" != "standard" ]]; then
+  URL="${URL}_${CEF_BUILD_VARIANT}.tar.bz2"
+else
+  URL="${URL}.tar.bz2"
+fi
 
 mkdir -p "${DEST_ROOT}"
 
-if [[ -d "${CEF_ROOT}/cmake" ]]; then
-  echo "CEF already present at ${CEF_ROOT}"
+resolve_cef_root() {
+  local candidates=()
+  if [[ -n "${CEF_BUILD_VARIANT}" && "${CEF_BUILD_VARIANT}" != "standard" ]]; then
+    candidates+=("${DEST_ROOT}/cef_binary_${CEF_VERSION}_${CEF_PLATFORM}_${CEF_BUILD_VARIANT}")
+  fi
+  candidates+=("${DEST_ROOT}/cef_binary_${CEF_VERSION}_${CEF_PLATFORM}")
+
+  local candidate
+  for candidate in "${candidates[@]}"; do
+    if [[ -d "${candidate}/cmake" ]]; then
+      CEF_ROOT="${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+emit_cef_root() {
   echo "CEF_ROOT=${CEF_ROOT}"
+  if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+    echo "root=${CEF_ROOT}" >> "${GITHUB_OUTPUT}"
+  fi
+}
+
+if resolve_cef_root; then
+  echo "CEF already present at ${CEF_ROOT}"
+  emit_cef_root
   exit 0
 fi
 
@@ -31,8 +68,10 @@ fi
 echo "Extracting ${ARCHIVE_PATH}"
 tar -xjf "${ARCHIVE_PATH}" -C "${DEST_ROOT}"
 
-if [[ ! -d "${CEF_ROOT}/cmake" ]]; then
-  echo "error: expected CEF cmake bootstrap at ${CEF_ROOT}/cmake" >&2
+if ! resolve_cef_root; then
+  echo "error: expected CEF cmake bootstrap under ${DEST_ROOT}" >&2
+  echo "contents:" >&2
+  ls -la "${DEST_ROOT}" >&2 || true
   exit 1
 fi
 
@@ -41,4 +80,4 @@ if [[ "${CI:-}" == "true" ]]; then
   rm -f "${ARCHIVE_PATH}"
 fi
 
-echo "CEF_ROOT=${CEF_ROOT}"
+emit_cef_root

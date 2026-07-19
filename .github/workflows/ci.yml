@@ -61,23 +61,23 @@ jobs:
             echo "version=${CEF_VERSION}"
             echo "platform=${CEF_PLATFORM}"
             echo "variant=${CEF_BUILD_VARIANT}"
-            echo "root=${GITHUB_WORKSPACE}/third_party/cef/cef_binary_${CEF_VERSION}_${CEF_PLATFORM}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Cache CEF binary distribution
         uses: actions/cache@v4
         with:
           path: third_party/cef
-          key: cef-${{ steps.cef.outputs.version }}-${{ steps.cef.outputs.platform }}-${{ steps.cef.outputs.variant }}
+          key: cef-${{ steps.cef.outputs.version }}-${{ steps.cef.outputs.platform }}-${{ steps.cef.outputs.variant }}-v2
 
       - name: Fetch CEF
+        id: fetch-cef
         run: |
           chmod +x scripts/fetch-cef.sh
           scripts/fetch-cef.sh "${GITHUB_WORKSPACE}/third_party/cef"
 
       - name: Configure (GCC Debug preset)
         env:
-          CEF_ROOT: ${{ steps.cef.outputs.root }}
+          CEF_ROOT: ${{ steps.fetch-cef.outputs.root }}
         run: cmake --preset gcc-debug
 
       - name: Build
