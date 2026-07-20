@@ -9,7 +9,7 @@
     {
       "name": "gcc-debug",
       "displayName": "GCC Debug (Linux)",
-      "description": "Recommended preset on Ubuntu Linux while Clang toolchain issues are being investigated.",
+      "description": "Recommended GCC Debug preset for Ubuntu Linux.",
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build-gcc",
       "cacheVariables": {

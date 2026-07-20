@@ -18,22 +18,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(GNUInstallDirs)
 include(CTest)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  if(EXISTS "/usr/lib/gcc/x86_64-linux-gnu/15")
-    add_compile_options("--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/15")
-    add_link_options("--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/15")
-    link_directories("/usr/lib/gcc/x86_64-linux-gnu/15")
-  endif()
-
-  if(EXISTS "/usr/include/c++/15")
-    add_compile_options("-isystem/usr/include/c++/15")
-  endif()
-
-  if(EXISTS "/usr/include/x86_64-linux-gnu/c++/15")
-    add_compile_options("-isystem/usr/include/x86_64-linux-gnu/c++/15")
-  endif()
-endif()
-
 if(CEFWSMCP_ENABLE_WARNINGS)
   add_compile_options(
     $<$<CXX_COMPILER_ID:MSVC>:/W4>

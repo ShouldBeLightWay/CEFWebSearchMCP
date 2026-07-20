@@ -26,13 +26,6 @@ if(CEFWSMCP_ENABLE_CEF)
   SET_EXECUTABLE_TARGET_PROPERTIES(cefwebsearchmcp_server)
   add_dependencies(cefwebsearchmcp_server libcef_dll_wrapper)
 
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_options(cefwebsearchmcp_server PRIVATE
-      -Wno-gcc-install-dir-libstdcxx
-      -Wno-error=gcc-install-dir-libstdcxx
-    )
-  endif()
-
   if(OS_LINUX)
     set_target_properties(cefwebsearchmcp_server PROPERTIES
       INSTALL_RPATH "$ORIGIN"
